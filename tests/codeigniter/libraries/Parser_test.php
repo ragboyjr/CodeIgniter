@@ -12,6 +12,7 @@ class Parser_test extends CI_TestCase {
 		$config = array('tmp' => 'no_val');	
 		$this->parser = new Mock_Libraries_Parser($config);
 		$this->ci_instance_var('parser', $this->parser);
+		
 	}
 
 	// --------------------------------------------------------------------
