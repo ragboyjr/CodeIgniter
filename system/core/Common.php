@@ -18,7 +18,7 @@
  *
  * @package		CodeIgniter
  * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright	Copyright (c) 2008 - 2013, EllisLab, Inc. (http://ellislab.com/)
  * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -413,14 +413,23 @@ if ( ! function_exists('log_message'))
 	 */
 	function log_message($level = 'error', $message, $php_error = FALSE)
 	{
-		static $_log;
+		static $_log, $_log_threshold;
+		
+		if ($_log_threshold === NULL)
+		{
+			$_log_threshold = config_item('log_threshold');
+		}
 
-		if (config_item('log_threshold') === 0)
+		if ($_log_threshold === 0)
 		{
 			return;
 		}
 
-		$_log =& load_class('Log', 'core');
+		if ($_log === NULL)
+		{
+			$_log =& load_class('Log', 'core');
+		}
+		
 		$_log->write_log($level, $message, $php_error);
 	}
 }

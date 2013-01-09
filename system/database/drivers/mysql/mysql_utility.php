@@ -18,7 +18,7 @@
  *
  * @package		CodeIgniter
  * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright	Copyright (c) 2008 - 2013, EllisLab, Inc. (http://ellislab.com/)
  * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -80,7 +80,7 @@ class CI_DB_mysql_utility extends CI_DB_utility {
 		// Do we need to include a statement to disable foreign key checks?
 		if ($foreign_key_checks === FALSE)
 		{
-			$output .= "SET foreign_key_checks = 0;".$newline;
+			$output .= 'SET foreign_key_checks = 0;'.$newline;
 		}
 
 		foreach ( (array) $tables as $table)
@@ -191,7 +191,7 @@ class CI_DB_mysql_utility extends CI_DB_utility {
 		// Do we need to include a statement to re-enable foreign key checks?
 		if ($foreign_key_checks === FALSE)
 		{
-			$output .= "SET foreign_key_checks = 1;".$newline;
+			$output .= 'SET foreign_key_checks = 1;'.$newline;
 		}
 
 		return $output;
