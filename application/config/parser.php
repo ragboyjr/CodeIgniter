@@ -18,7 +18,7 @@
  *
  * @package		CodeIgniter
  * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2012, EllisLab, Inc. (http://ellislab.com/)
+ * @copyright	Copyright (c) 2008 - 2013, EllisLab, Inc. (http://ellislab.com/)
  * @license		http://opensource.org/licenses/AFL-3.0 Academic Free License (AFL 3.0)
  * @link		http://codeigniter.com
  * @since		Version 1.0
@@ -59,7 +59,7 @@ $config['valid_drivers'] = array();
 | File Directories
 | -------------------------------------------------------------------------
 | Some default directories for the parser drivers. These variables don't apply
-| to every driver. For example, CI's Scorch driver uses CI views for its
+| to every driver. For example, CI's simple parser uses CI views for its
 | templates.
 | 'var_name'		= description - default value
 |
