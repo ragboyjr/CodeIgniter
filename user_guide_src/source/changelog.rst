@@ -268,6 +268,10 @@ Release Date: Not Released
 	 -  Added support for timestamp-based migrations (enabled by default).
 	 -  Added ``$config['migration_type']`` to allow switching between *sequential* and *timestamp* migrations.
    -  :doc:`User Agent Library <libraries/user_agent>` will now check if robots are pretending to be mobile clients (helps with e.g. Google indexing mobile website versions).
+   -  :doc:`Parser Library <libraries/parsers>` changes include:
+	 -  Library changed to :doc:`Driver <general/drivers>` with classic Simple driver as default.
+	 -  Added default ``$config['parser_driver']`` and ``$config['parser_valid_drivers']`` items to *config.php* file.
+	 -  Added ability for any undefined method/property called to parser to run to the parser driver
 
 -  Core
 

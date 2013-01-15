@@ -38,11 +38,11 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class CI_Parser extends CI_Driver_Library {
 
 	/**
-	 * Config array for template paths, to be used by children drivers
+	 * Initialization parameters
 	 *
-	 * @var array
+	 * @var	array
 	 */
-	public $template_config = array();
+	public $params = array();
 
 	/**
 	 * Valid parser drivers
@@ -59,13 +59,6 @@ class CI_Parser extends CI_Driver_Library {
 	 * @var mixed
 	 */
 	protected $driver;
-	
-	/**
-	 * Reference to Codeigniter Instance
-	 *
-	 * @var object
-	 */
-	protected $ci;
 
 
 	// --------------------------------------------------------------------
@@ -75,38 +68,44 @@ class CI_Parser extends CI_Driver_Library {
 	 *
 	 * @return	void
 	 */
-	public function __construct($config = array())
+	public function __construct(array $params = array())
 	{
-		$this->ci = &get_instance();
+		$CI = &get_instance();
 		
-		$default_config = array(
-			'valid_drivers' => array(),
-			'driver'		=> '',
-			'template_dir'	=> '',
-			'cache_dir'		=> '',
-			'compile_dir'	=> '',
-		);
+		$tmp_vdrivers = array_map('strtolower', $this->valid_drivers);
 		
-		if (count($config) > 0)
+		// load up the valid drivers
+		$drivers = isset($params['parser_valid_drivers']) ? $params['parser_valid_drivers'] : $CI->config->item('parser_valid_drivers');
+		if ($drivers)
 		{
-			$default_config = array_merge($default_config, $config);
+			// Add driver names to valid list
+			foreach ((array) $drivers as $driver)
+			{
+				if ( ! in_array(strtolower($driver), $tmp_vdrivers))
+				{
+					$this->valid_drivers[] = $driver;
+				}
+			}
 		}
-		else
-		{
-			$default_config = $this->ci->config->item('parser');
-		}
-		
-		// if user added some drivers, then we need put them in the valid_drivers array
-		// to get loaded
-		$this->valid_drivers = array_merge($this->valid_drivers, $default_config['valid_drivers']);
-		
-		// set template config items
-		$this->template_config['template_dir']	= ($default_config['template_dir'])	? $default_config['template_dir'] : APPPATH.'views/templates/';
-		$this->template_config['cache_dir']		= ($default_config['cache_dir'])	? $default_config['cache_dir'] : APPPATH.'cache/';
-		$this->template_config['compile_dir']	= ($default_config['compile_dir'])	? $default_config['compile_dir'] : APPPATH.'views/templates/compile/';
 
-		// set the driver
-		$this->driver = $this->load_driver((($default_config['driver']) ? $default_config['driver'] : 'simple'));	// make sure we have a driver to load
+		// Get driver to load
+		$driver = isset($params['parser_driver']) ? $params['parser_driver'] : $CI->config->item('parser_driver');
+		if ( ! $driver)
+		{
+			$driver = 'simple';
+		}
+
+		// if the driver isn't already in the valid_drivers then we add it here
+		if ( ! in_array(strtolower($driver), array_map('strtolower', $tmp_vdrivers)))
+		{
+			$this->valid_drivers[] = $driver;
+		}
+
+		// Save a copy of parameters in case drivers need access
+		$this->params = $params;
+
+		// Load driver and get array reference
+		$this->driver = $this->load_driver($driver);
 	}
 	
 	/**
@@ -139,7 +138,7 @@ class CI_Parser extends CI_Driver_Library {
 	 * @param	bool
 	 * @return	string
 	 */
-	public function parse_string($template, $data, $return = FALSE)
+	public function parse_string($template, $data = array(), $return = FALSE)
 	{
 		return $this->driver->parse_string($template, $data, $return);
 	}
