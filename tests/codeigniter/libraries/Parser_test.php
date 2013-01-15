@@ -8,6 +8,11 @@ class Parser_test extends CI_TestCase {
 		$this->subclass = 'Mock_Libraries_';
 		$this->ci_set_config('subclass_prefix', $this->subclass);
 		
+		// Establish necessary support classes
+		$ci = $this->ci_instance();
+		$ldr = $this->ci_core_class('load');
+		$ci->load = new $ldr();
+		
 		// pass in a useless array to bypass loading from config file
 		$config = array('tmp' => 'no_val');	
 		$this->parser = new Mock_Libraries_Parser($config);
