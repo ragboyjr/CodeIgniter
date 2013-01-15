@@ -83,7 +83,7 @@ class CI_Parser_simple extends CI_Parser_driver {
 	 * @param	bool
 	 * @return	string
 	 */
-	public function parse($template, $data, $return = FALSE)
+	public function parse($template, $data = array(), $return = FALSE)
 	{
 		$template = $this->CI->load->view($template, $data, TRUE);
 
@@ -103,7 +103,7 @@ class CI_Parser_simple extends CI_Parser_driver {
 	 * @param	bool
 	 * @return	string
 	 */
-	public function parse_string($template, $data, $return = FALSE)
+	public function parse_string($template, $data = array(), $return = FALSE)
 	{
 		return $this->_parse($template, $data, $return);
 	}

@@ -65,7 +65,7 @@ class CI_Parser extends CI_Driver_Library {
 	 *
 	 * @var object
 	 */
-	private $ci;
+	protected $ci;
 
 
 	// --------------------------------------------------------------------
@@ -125,7 +125,6 @@ class CI_Parser extends CI_Driver_Library {
 	{
 		return $this->driver->parse($template, $data, $return);
 	}
-	
 
 	// --------------------------------------------------------------------
 
@@ -145,6 +144,15 @@ class CI_Parser extends CI_Driver_Library {
 		return $this->driver->parse_string($template, $data, $return);
 	}
 	
+	/**
+	 * __get magic method
+	 *
+	 * Any property references to the parser driver will default to calling the specified 
+	 * adapter
+	 *
+	 * @param	string
+	 * @return	mixed
+	 */
 	public function __get($name)
 	{
 		if (property_exists($this->driver, $name))
@@ -236,7 +244,7 @@ abstract class CI_Parser_driver extends CI_Driver {
 	 * @param	bool
 	 * @return	string
 	 */
-	abstract public function parse_string($template, $data, $return = FALSE);
+	abstract public function parse_string($template, $data = array(), $return = FALSE);
 	
 	/**
 	 * Initialize driver
