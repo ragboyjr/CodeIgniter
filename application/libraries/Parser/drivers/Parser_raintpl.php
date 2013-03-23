@@ -41,105 +41,85 @@ require_once APPPATH . 'third_party/Rain/Tpl.php';
 class CI_Parser_raintpl extends CI_Driver {
 
 	/**
-	* raintpl template instance
+	* tpl template instance
 	*
 	* @var object
 	*/
-	protected $raintpl;
+	protected $tpl;
 	
-	protected $raintpl_methods;
+	protected $tpl_methods;
 	
-	protected $raintpl_properties;
+	protected $tpl_properties;
 	
-	protected $raintpl_config;
-	
-	private $ci;
+	protected $tpl_config;
 
 	public function __construct()
 	{
-		parent::__construct();
-
-		$this->ci = &get_instance();
-		$this->raintpl = new RainTPL();
-		$this->raintpl_config = $this->default_config['raintpl'];	// get from "parent" parser class
+		$ci = &get_instance();
 		
-		// lets cache all of the methods and properties for raintpl to use in magic methods
-		$r = new ReflectionObject($this->raintpl);
-
-		foreach ($r->getMethods() as $method)
+		$config = array(
+			'charset'			=> 'UTF-8',
+			'debug'				=> FALSE,
+			'tpl_dir'			=> APPPATH . 'templates/',
+			'cache_dir'			=> APPPATH . 'cache/',
+			'tpl_ext'			=> 'html',
+			'base_url'			=> '',
+			'php_enabled'		=> FALSE,
+			'template_syntax'	=> 'Rain',
+			'auto_escape'		=> TRUE,
+			'sandbox'			=> TRUE
+		);
+		
+		if ($ci->config->load('raintpl', TRUE, TRUE))
 		{
-			if ($method->isPublic())
-			{
-				$this->raintpl_methods[$method->getName()] = NULL;
-			}
+			$config = array_merge($config, $ci->config->item('raintpl'));
 		}
-
-		foreach ($r->getProperties() as $prop)
-		{
-			if ($prop->isPublic())
-			{
-				$this->raintpl_properties[$prop->getName()] = NULL;
-			}
-		}
+		
+		$this->tpl = new Rain\Tpl();
 		
 		// set the config items
-		RainTPL::configure('tpl_dir', $this->raintpl_config['template_dir']);
-		RainTPL::configure('cache_dir', $this->raintpl_config['cache_dir']);
-		RainTPL::configure('base_url', $this->raintpl_config['base_url']);
-		RainTPL::configure('tpl_ext', $this->raintpl_config['tpl_ext']);
-		RainTPL::configure('path_replace', $this->raintpl_config['path_replace']);
-		RainTPL::configure('path_replace_list', $this->raintpl_config['path_replace_list']);
-		RainTPL::configure('black_list', $this->raintpl_config['black_list']);
-		RainTPL::configure('check_template_update', $this->raintpl_config['check_template_update']);
-		RainTPL::configure('php_enabled', $this->raintpl_config['php_enabled']);
+		Rain\Tpl::configure($config);
 		
-		log_message('debug', "raintpl Class Initialized");
+		log_message('debug', "Rain\Tpl Class Initialized");
 	}
 	
-	public function parse($template, $data, $return = FALSE)
+	public function parse($template, $data = array(), $return = FALSE)
 	{
 		foreach ($data as $key => $value)
 		{
-			$this->raintpl->assign($key, $value);
+			$this->tpl->assign($key, $value);
 		}
 
-		return $this->raintpl->draw($template, $return);
+		return $this->tpl->draw($template, $return);
 	}
 	
-	public function parse_string($template, $data, $return = FALSE){return FALSE;}	// no such way to do so in current version of raintpl
-	
-	/**
-	* Magic Methods
-	*
-	* The following magic methods are defined so that they try to call raintpl first
-	* and then they try to call the "parent" driver.
-	*/
-	
-	public function __get($property)
+	public function parse_string($template, $data = array(), $return = FALSE)
 	{
-		if (array_key_exists($property, $this->raintpl_properties))
+		foreach ($data as $key => $value)
 		{
-			return $this->raintpl->{$property};
+			$this->tpl->assign($key, $value);
 		}
-		else
-		{
-			return parent::__get($property);	// we may be trying to access a "parent" property
-		}
-	}
-	
-	public function __call($method, $args = array())
-	{
-		if (array_key_exists($method, $this->raintpl_methods))
-		{
-			return call_user_func_array(array($this->raintpl, $method), $args);
-		}
-		else
-		{
-			return parent::__call($method, $args);
-		}
-		
-	}
 
+		return $this->tpl->drawString($template, $return);
+	}
+	
+	/*
+	 * Rain\Tpl Methods
+	 */
+	public function draw($template_path, $to_string = FALSE)
+	{
+        $this->tpl->draw($template_path, $to_string);
+    }
+
+    public function drawString($string, $to_string = FALSE)
+    {
+        $this->tpl->drawString($string, $to_string);
+    }
+
+    public function assign($variable, $value = NULL)
+    {
+    	$this->tpl->assign($variable, $value);
+    }
 }
 
 /* End of file Parser.php */
