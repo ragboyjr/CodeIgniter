@@ -149,7 +149,7 @@ if ( ! function_exists('load_class'))
 			{
 				$name = $prefix.$class;
 
-				if (class_exists($name) === FALSE)
+				if (class_exists($name, FALSE) === FALSE)
 				{
 					require_once($path.$directory.'/'.$class.'.php');
 				}
@@ -163,7 +163,7 @@ if ( ! function_exists('load_class'))
 		{
 			$name = config_item('subclass_prefix').$class;
 
-			if (class_exists($name) === FALSE)
+			if (class_exists($name, FALSE) === FALSE)
 			{
 				require_once(APPPATH.$directory.'/'.config_item('subclass_prefix').$class.'.php');
 			}
@@ -175,7 +175,8 @@ if ( ! function_exists('load_class'))
 			// Note: We use exit() rather then show_error() in order to avoid a
 			// self-referencing loop with the Exceptions class
 			set_status_header(503);
-			exit('Unable to locate the specified class: '.$class.'.php');
+			echo 'Unable to locate the specified class: '.$class.'.php';
+			exit(EXIT_UNKNOWN_CLASS);
 		}
 
 		// Keep track of what we just loaded
@@ -241,21 +242,23 @@ if ( ! function_exists('get_config'))
 		}
 
 		// Is the config file in the environment folder?
-		if (defined('ENVIRONMENT') && file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
+		if (file_exists($file_path = APPPATH.'config/'.ENVIRONMENT.'/config.php'))
 		{
 			require($file_path);
 		}
 		elseif ( ! $found)
 		{
 			set_status_header(503);
-			exit('The configuration file does not exist.');
+			echo 'The configuration file does not exist.';
+			exit(EXIT_CONFIG);
 		}
 
 		// Does the $config array exist in the file?
 		if ( ! isset($config) OR ! is_array($config))
 		{
 			set_status_header(503);
-			exit('Your config file does not appear to be formatted correctly.');
+			echo 'Your config file does not appear to be formatted correctly.';
+			exit(EXIT_CONFIG);
 		}
 
 		// Are any values being dynamically replaced?
@@ -316,11 +319,11 @@ if ( ! function_exists('get_mimes'))
 	{
 		static $_mimes = array();
 
-		if (defined('ENVIRONMENT') && is_file(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
+		if (file_exists(APPPATH.'config/'.ENVIRONMENT.'/mimes.php'))
 		{
 			$_mimes = include(APPPATH.'config/'.ENVIRONMENT.'/mimes.php');
 		}
-		elseif (is_file(APPPATH.'config/mimes.php'))
+		elseif (file_exists(APPPATH.'config/mimes.php'))
 		{
 			$_mimes = include(APPPATH.'config/mimes.php');
 		}
@@ -343,7 +346,7 @@ if ( ! function_exists('is_https'))
 	 */
 	function is_https()
 	{
-		return ( ! empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off');
+		return (isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) === 'on');
 	}
 }
 
@@ -367,9 +370,24 @@ if ( ! function_exists('show_error'))
 	 */
 	function show_error($message, $status_code = 500, $heading = 'An Error Was Encountered')
 	{
+		$status_code = abs($status_code);
+		if ($status_code < 100)
+		{
+			$exit_status = $status_code + EXIT__AUTO_MIN;
+			if ($exit_status > EXIT__AUTO_MAX)
+			{
+				$exit_status = EXIT_ERROR;
+			}
+			$status_code = 500;
+		}
+		else
+		{
+			$exit_status = EXIT_ERROR;
+		}
+
 		$_error =& load_class('Exceptions', 'core');
 		echo $_error->show_error($heading, $message, 'error_general', $status_code);
-		exit;
+		exit($exit_status);
 	}
 }
 
@@ -392,7 +410,7 @@ if ( ! function_exists('show_404'))
 	{
 		$_error =& load_class('Exceptions', 'core');
 		$_error->show_404($page, $log_error);
-		exit;
+		exit(EXIT_UNKNOWN_FILE);
 	}
 }
 
@@ -414,7 +432,7 @@ if ( ! function_exists('log_message'))
 	function log_message($level = 'error', $message, $php_error = FALSE)
 	{
 		static $_log, $_log_threshold;
-		
+
 		if ($_log_threshold === NULL)
 		{
 			$_log_threshold = config_item('log_threshold');
@@ -429,7 +447,7 @@ if ( ! function_exists('log_message'))
 		{
 			$_log =& load_class('Log', 'core');
 		}
-		
+
 		$_log->write_log($level, $message, $php_error);
 	}
 }

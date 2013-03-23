@@ -428,20 +428,6 @@ abstract class CI_DB_driver {
 			}
 		}
 
-		// ----------------------------------------------------------------
-
-		// Select the DB... assuming a database name is specified in the config file
-		if ($this->database !== '' && ! $this->db_select())
-		{
-			log_message('error', 'Unable to select database: '.$this->database);
-
-			if ($this->db_debug)
-			{
-				$this->display_error('db_unable_to_select', $this->database);
-			}
-			return FALSE;
-		}
-
 		// Now we set the character set and that's all
 		return $this->db_set_charset($this->char_set);
 	}
@@ -639,7 +625,7 @@ abstract class CI_DB_driver {
 				// if transactions are enabled. If we don't call this here
 				// the error message will trigger an exit, causing the
 				// transactions to remain in limbo.
-				$this->trans_complete();
+				$this->_trans_depth > 0 && $this->trans_complete();
 
 				// Display errors
 				return $this->display_error(array('Error Number: '.$error['code'], $error['message'], $sql));
@@ -993,7 +979,7 @@ abstract class CI_DB_driver {
 		{
 			return ($str === FALSE) ? 0 : 1;
 		}
-		elseif (is_null($str))
+		elseif ($str === NULL)
 		{
 			return 'NULL';
 		}
@@ -1222,13 +1208,8 @@ abstract class CI_DB_driver {
 				}
 				else
 				{
-					/* We have no other choice but to just get the first element's key.
-					 * Due to array_shift() accepting it's argument by reference, if
-					 * E_STRICT is on, this would trigger a warning. So we'll have to
-					 * assign it first.
-					 */
-					$key = array_keys($row);
-					$key = array_shift($key);
+					// We have no other choice but to just get the first element's key.
+					$key = key($row);
 				}
 			}
 
@@ -1574,7 +1555,7 @@ abstract class CI_DB_driver {
 	 */
 	protected function _cache_init()
 	{
-		if (class_exists('CI_DB_Cache'))
+		if (class_exists('CI_DB_Cache', FALSE))
 		{
 			if (is_object($this->CACHE))
 			{
@@ -1672,7 +1653,7 @@ abstract class CI_DB_driver {
 
 		$error =& load_class('Exceptions', 'core');
 		echo $error->show_error($heading, $message, 'error_db');
-		exit;
+		exit(EXIT_DATABASE);
 	}
 
 	// --------------------------------------------------------------------

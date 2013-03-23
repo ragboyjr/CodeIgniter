@@ -110,9 +110,23 @@ class CI_DB_mysql_driver extends CI_DB {
 			$client_flags = $client_flags | MYSQL_CLIENT_SSL;
 		}
 
-		return ($persistent === TRUE)
+		$this->conn_id = ($persistent === TRUE)
 			? @mysql_pconnect($this->hostname, $this->username, $this->password, $client_flags)
 			: @mysql_connect($this->hostname, $this->username, $this->password, TRUE, $client_flags);
+
+		// ----------------------------------------------------------------
+
+		// Select the DB... assuming a database name is specified in the config file
+		if ($this->database !== '' && ! $this->db_select())
+		{
+			log_message('error', 'Unable to select database: '.$this->database);
+
+			return ($this->db_debug === TRUE)
+				? $this->display_error('db_unable_to_select', $this->database)
+				: FALSE;
+		}
+
+		return $this->conn_id;
 	}
 
 	// --------------------------------------------------------------------
@@ -437,47 +451,6 @@ class CI_DB_mysql_driver extends CI_DB {
 	public function error()
 	{
 		return array('code' => mysql_errno($this->conn_id), 'message' => mysql_error($this->conn_id));
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Update_Batch statement
-	 *
-	 * Generates a platform-specific batch update string from the supplied data
-	 *
-	 * @param	string	$table	Table name
-	 * @param	array	$values	Update data
-	 * @param	string	$index	WHERE key
-	 * @return	string
-	 */
-	protected function _update_batch($table, $values, $index)
-	{
-		$ids = array();
-		foreach ($values as $key => $val)
-		{
-			$ids[] = $val[$index];
-
-			foreach (array_keys($val) as $field)
-			{
-				if ($field !== $index)
-				{
-					$final[$field][] = 'WHEN '.$index.' = '.$val[$index].' THEN '.$val[$field];
-				}
-			}
-		}
-
-		$cases = '';
-		foreach ($final as $k => $v)
-		{
-			$cases .= $k." = CASE \n"
-				.implode("\n", $v)."\n"
-				.'ELSE '.$k.' END, ';
-		}
-
-		$this->where($index.' IN('.implode(',', $ids).')', NULL, FALSE);
-
-		return 'UPDATE '.$table.' SET '.substr($cases, 0, -2).$this->_compile_wh('qb_where');
 	}
 
 	// --------------------------------------------------------------------

@@ -494,7 +494,7 @@ class CI_Session_cookie extends CI_Session_driver {
 		$this->userdata = array(
 			'session_id'	=> $this->_make_sess_id(),
 			'ip_address'	=> $this->CI->input->ip_address(),
-			'user_agent'	=> substr($this->CI->input->user_agent(), 0, 120),
+			'user_agent'	=> trim(substr($this->CI->input->user_agent(), 0, 120)),
 			'last_activity'	=> $this->now,
 		);
 
@@ -601,6 +601,9 @@ class CI_Session_cookie extends CI_Session_driver {
 				// Serialize the custom data array so we can store it
 				$set['user_data'] = $this->_serialize($userdata);
 			}
+
+			// Reset query builder values.
+			$this->CI->db->reset_query();
 
 			// Run the update query
 			// Any time we change the session id, it gets updated immediately,
@@ -805,7 +808,7 @@ class CI_Session_cookie extends CI_Session_driver {
 	{
 		if (is_string($val))
 		{
-	 		$val= str_replace('{{slash}}', '\\', $val);
+	 		$val = str_replace('{{slash}}', '\\', $val);
 		}
 	}
 
