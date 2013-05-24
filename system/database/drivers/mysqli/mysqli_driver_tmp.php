@@ -39,7 +39,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * @author		EllisLab Dev Team
  * @link		http://codeigniter.com/user_guide/database/
  */
-class CI_DB_mysqli_driver extends CI_DB_query_builder {
+class CI_DB_mysqli_driver_tmp extends CI_DB_query_builder_tmp {
 
 	/**
 	 * Database driver
@@ -194,7 +194,7 @@ class CI_DB_mysqli_driver extends CI_DB_query_builder {
 	 * @return	mixed
 	 */
 	protected function _execute($sql)
-	{	
+	{
 		global $print_query;
 		if ($print_query)
 		{

@@ -202,7 +202,7 @@ abstract class CI_DB_driver {
 	 *
 	 * @var	bool
 	 */
-	public $save_queries		= TRUE;
+	public $save_queries		= FALSE;
 
 	/**
 	 * Queries list
@@ -604,7 +604,7 @@ abstract class CI_DB_driver {
 
 		// Run the Query
 		if (FALSE === ($this->result_id = $this->simple_query($sql)))
-		{
+		{return false;
 			if ($this->save_queries === TRUE)
 			{
 				$this->query_times[] = 0;

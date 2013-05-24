@@ -159,8 +159,12 @@ function &DB($params = '', $query_builder_override = NULL)
 			 * @see	CI_DB_query_builder
 			 * @see	CI_DB_driver
 			 */
-			class CI_DB extends CI_DB_query_builder { }
+			//class CI_DB extends CI_DB_query_builder { }
 		}
+	}
+	else if ($query_builder === 'tmp')	// dummy value for loading up tmp
+	{
+		require_once(BASEPATH . 'database/DB_query_builder_tmp.php');
 	}
 	elseif ( ! class_exists('CI_DB', FALSE))
 	{
@@ -183,6 +187,13 @@ function &DB($params = '', $query_builder_override = NULL)
 	// Instantiate the DB adapter
 	$driver = 'CI_DB_'.$params['dbdriver'].'_driver';
 	$DB = new $driver($params);
+	
+	if ($query_builder === 'tmp')
+	{
+		require_once  BASEPATH.'database/drivers/'.$params['dbdriver'].'/'.$params['dbdriver'].'_driver_tmp.php';
+		$driver = 'CI_DB_'.$params['dbdriver'].'_driver_tmp';
+		$DB = new $driver($params);
+	}
 
 	// Check for a subdriver
 	if ( ! empty($DB->subdriver))
