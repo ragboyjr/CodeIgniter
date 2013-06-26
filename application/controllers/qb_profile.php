@@ -79,8 +79,13 @@ class Qb_profile extends CI_Controller
 	{
 		if ($type == 'get')
 		{
-			$this->db->get('mytable');		
+			$this->db->get('mytable');
 			$this->db_fast->get('mytable');
+		}
+		else if ($type == 'if')
+		{
+			$this->db->select('if(riders.id IS NULL, 0, 1)');
+			$this->db->get('riders');
 		}
 		
 		exit;
