@@ -217,6 +217,7 @@ Release Date: Not Released
 	 -  Added an **index** parameter to the ``data()`` method.
 	 -  Added the **min_width** and **min_height** options for images.
 	 -  Removed method ``clean_file_name()`` and its usage in favor of :doc:`Security Library <libraries/security>`'s ``sanitize_filename()``.
+     -  Added **file_ext_tolower** config setting.
    -  :doc:`Cart library <libraries/cart>` changes include:
 	 -  ``insert()`` now auto-increments quantity for an item when inserted twice instead of resetting it, this is the default behaviour of large e-commerce sites.
 	 -  *Product Name* strictness can be disabled by switching the ``$product_name_safe`` property to FALSE.
@@ -499,6 +500,7 @@ Bug fixes for 3.0
 -  Fixed a bug (#77) - :doc:`Database Class <database/index>` didn't properly handle the transaction "test mode" flag.
 -  Fixed a bug (#2380) - :doc:`URI Routing <general/routing>` method ``fetch_method()`` returned 'index' if the requested method name matches its controller name.
 -  Fixed a bug (#2388) - :doc:`Email Library <libraries/email>` used to ignore attachment errors, resulting in broken emails being sent.
+-  Fixed a bug (#2498) - :doc:`Form Validation Library <libraries/form_validation>` rule **valid_base64** only checked characters instead of actual validity.
 
 Version 2.1.3
 =============
@@ -1991,9 +1993,8 @@ Release Date: January 30, 2008
       for the community to use in writing their own documentation.
    -  Added titles to all user manual pages.
    -  Added attributes into <html> of userguide for valid html.
-   -  Added `Zip Encoding
-      Class <http://codeigniter.com/user_guide/libraries/zip>`_ to
-      the table of contents of the userguide.
+   -  Added :doc:`Zip Encoding Class <libraries/zip>`
+      to the table of contents of the userguide.
    -  Moved part of the userguide menu javascript to an external file.
    -  Documented distinct() in :doc:`Active
       Record <./database/query_builder>`.
